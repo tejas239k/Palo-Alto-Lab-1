@@ -1,0 +1,107 @@
+PALO ALTO LAB-1
+
+configure
+set deviceconfig system type static
+set deviceconfig system ip-address 192.168.10.10 netmask 255.255.255.0
+commit
+exit
+show interface management
+
+Creating zones in palo alto
+
+Under the network tab select zones
+Name: Inside
+Type: Layer3
+press ok
+
+Name: Outside
+Type: Layer3
+press ok
+
+Setting up a static ip address
+
+Under the network tab select Interfaces
+ethernet1/2
+Interface type: Layer3
+Virtual Router: default
+Security Zone: Inside(Because on this interface the lan is connected)
+Under Ipv4 for the same interface ethernet1/2
+click Add and type the interface Ip address i.e 192.168.20.10/24
+To check if we could ping this interface 
+Under Advanced
+management profil select new
+name the profile ex: Ping
+and checkmark the Network Services: Ping
+press ok
+
+ethernet1/1
+Interface type: Layer3
+Virtual Router: default
+Security Zone: Outside(Towards Internet)
+Under Ipv4 select DHCP Client
+
+After this Press Commit(Most Important thing after every change/configuration)
+
+Setting up DHCP Server in Palo Alto
+
+Under network tab select DHCP
+press add
+interface: ethernet1/2
+under Lease
+IP pools
+press add
+define the address pool
+192.168.20.11-192.168.20.21
+under Options
+Gateway: 192.168.20.10(IP address on ethernet1/2)
+Subnet Mask: 255.255.255.0
+Primary DNS: 8.8.8.8
+press ok
+COMMIT
+
+After this open the client windows go to the terminal(cmd) and 
+check ip address assigned
+ipconfig and 
+
+try to ping 192.168.20.10
+
+Security Profiles 
+
+Under the policies 
+select security
+add
+under General
+name: InToOut(You can give any name)
+Rule Type: universal(default)
+under Source
+source zone
+inside
+destination zone
+outside
+press ok
+
+SNAT
+
+Under the policies
+select NAT
+add
+under General
+name: SNAT(any name)
+under Original Packet
+add
+source zone: inside
+destination zone: outside
+under Translated Packet
+Translation Type: Dynamic IP and Port
+Address Type: Interface Address
+Interface: ethernet1/1(Interface in the outside zone)
+press ok
+COMMIT
+
+After this open the client windows go to the terminal(cmd) and 
+ping 8.8.8.8
+or
+open browser and search https://something.com
+
+If both of these work. 
+You have successfully configured DHCP and SNAT properly!
